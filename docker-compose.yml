@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: rpa-price-monitor
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - monitor-network
+
+  mongo:
+    image: mongo:7
+    container_name: rpa-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - monitor-network
+
+volumes:
+  mongo-data:
+
+networks:
+  monitor-network:
+    driver: bridge
