@@ -71,11 +71,28 @@ export async function addProduct(
   targetPrice: number,
   logger: LoggerHelper,
 ): Promise<IProduct> {
-  const product = await Product.create({ name, url, targetPrice });
-  logger.log("INFO", `Produto cadastrado: ${name}`);
-  return product;
+  const productExists = await findProduct(name, logger);
+  if (productExists) {
+    logger.log("WARN", `Produto já existe: ${name}`);
+    return productExists;
+  } else {
+    const product = await Product.create({ name, url, targetPrice });
+    logger.log("INFO", `Produto cadastrado: ${name}`);
+    return product;
+  }
 }
 
 export async function getPriceHistory(productId: string) {
   return PriceHistory.find({ productId }).sort({ scrapedAt: -1 }).limit(30);
+}
+
+export async function findProduct(productName: string, logger: LoggerHelper) {
+  const product = await Product.findOne({ name: productName });
+  if (product) {
+    logger.log("INFO", `Produto encontrado: ${product.name}`);
+    return product;
+  } else {
+    logger.log("WARN", `Produto não encontrado: ${productName}`);
+    return false;
+  }
 }
