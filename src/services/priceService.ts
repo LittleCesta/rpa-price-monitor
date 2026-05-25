@@ -2,29 +2,35 @@ import Product, { IProduct } from "../models/Product";
 import PriceHistory from "../models/PriceHistory";
 import { scrapeMercadoLivre } from "../scrapers/mercadoLivreScraper";
 import { sendPriceAlert } from "./alertService";
-import logger from "../utils/logger";
+import LoggerHelper from "../utils/logger";
 import { ENVIRONMENT } from "../environment";
 
-export async function checkAllProducts(): Promise<void> {
+export async function checkAllProducts(logger: LoggerHelper): Promise<void> {
   const products = await Product.find();
 
   if (products.length === 0) {
-    logger.warn("Nenhum produto cadastrado para monitorar.");
+    logger.log("WARN", "Nenhum produto cadastrado para monitorar.");
     return;
   }
 
-  logger.info(`Iniciando monitoramento de ${products.length} produto(s)...`);
+  logger.log(
+    "INFO",
+    `Iniciando monitoramento de ${products.length} produto(s)...`,
+  );
 
   for (const product of products) {
-    await checkProduct(product);
+    await checkProduct(product, logger);
   }
 }
 
-async function checkProduct(product: IProduct): Promise<void> {
-  const result = await scrapeMercadoLivre(product.url);
+async function checkProduct(
+  product: IProduct,
+  logger: LoggerHelper,
+): Promise<void> {
+  const result = await scrapeMercadoLivre(product.url, logger);
 
   if (!result.price) {
-    logger.warn(`Preço não encontrado para: ${product.name}`);
+    logger.log("WARN", `Preço não encontrado para: ${product.name}`);
     return;
   }
 
@@ -36,7 +42,10 @@ async function checkProduct(product: IProduct): Promise<void> {
     available: result.available,
   });
 
-  logger.info(`[${product.name}] Preço atual: R$ ${result.price.toFixed(2)}`);
+  logger.log(
+    "INFO",
+    `[${product.name}] Preço atual: R$ ${result.price.toFixed(2)}`,
+  );
 
   const droppedEnough =
     result.price <= product.targetPrice ||
@@ -44,12 +53,15 @@ async function checkProduct(product: IProduct): Promise<void> {
       ENVIRONMENT.threshold;
 
   if (droppedEnough && result.available) {
-    await sendPriceAlert({
-      productName: product.name,
-      currentPrice: result.price,
-      targetPrice: product.targetPrice,
-      url: product.url,
-    });
+    await sendPriceAlert(
+      {
+        productName: product.name,
+        currentPrice: result.price,
+        targetPrice: product.targetPrice,
+        url: product.url,
+      },
+      logger,
+    );
   }
 }
 
@@ -57,9 +69,10 @@ export async function addProduct(
   name: string,
   url: string,
   targetPrice: number,
+  logger: LoggerHelper,
 ): Promise<IProduct> {
   const product = await Product.create({ name, url, targetPrice });
-  logger.info(`Produto cadastrado: ${name}`);
+  logger.log("INFO", `Produto cadastrado: ${name}`);
   return product;
 }
 

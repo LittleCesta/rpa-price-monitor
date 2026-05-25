@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-import logger from "../utils/logger";
+import LoggerHelper from "../utils/logger";
 import { browserConfig } from "../environment";
 
 export interface ScrapeResult {
@@ -8,7 +8,17 @@ export interface ScrapeResult {
   title: string;
 }
 
-export async function scrapeMercadoLivre(url: string): Promise<ScrapeResult> {
+function parsePrice(text: string | null): number | null {
+  if (!text) return null;
+  const cleaned = text.replace(/\./g, "").replace(",", ".").trim();
+  const value = parseFloat(cleaned);
+  return isNaN(value) ? null : value;
+}
+
+export async function scrapeMercadoLivre(
+  url: string,
+  logger: LoggerHelper,
+): Promise<ScrapeResult> {
   const browser = await chromium.launch(browserConfig);
   const context = await browser.newContext({
     userAgent:
@@ -18,30 +28,37 @@ export async function scrapeMercadoLivre(url: string): Promise<ScrapeResult> {
   const page = await context.newPage();
 
   try {
-    logger.info(`Scraping: ${url}`);
+    logger.log("INFO", `Scraping: ${url}`);
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30_000 });
 
-    await page.pause();
-
-    // Título do produto
     const title = await page
       .locator("h1.ui-pdp-title")
       .first()
       .textContent()
       .catch(() => "Título não encontrado");
 
-    // Preço principal
-    const priceText = await page
-      .locator(".andes-money-amount__fraction")
-      .first()
-      .textContent()
-      .catch(() => null);
+    let price: number | null = null;
 
-    const price = priceText
-      ? parseFloat(priceText.replace(/\./g, "").replace(",", "."))
-      : null;
+    // Tenta pegar o preço com desconto primeiro
+    try {
+      const discountLocator = page
+        .locator(".ui-pdp-price__second-value .andes-money-amount__fraction")
+        .first();
+      await discountLocator.waitFor({ state: "visible", timeout: 7000 });
+      price = parsePrice(await discountLocator.textContent());
+      logger.log("INFO", `Preço com desconto encontrado: ${price}`);
+    } catch {
+      // Fallback: preço normal
+      logger.log(
+        "INFO",
+        "Preço com desconto não encontrado, usando preço normal.",
+      );
+      const normalLocator = page
+        .locator(".ui-pdp-price__main-value .andes-money-amount__fraction")
+        .first();
+      price = parsePrice(await normalLocator.textContent().catch(() => null));
+    }
 
-    // Disponibilidade
     const unavailable = await page
       .locator("text=indisponível")
       .count()
@@ -54,7 +71,7 @@ export async function scrapeMercadoLivre(url: string): Promise<ScrapeResult> {
       available: !unavailable && price !== null,
     };
   } catch (error) {
-    logger.error(`Erro ao fazer scraping de ${url}:`, error);
+    logger.log("ERROR", `Erro ao fazer scraping de ${url}: ${error}`);
     return { title: "Erro", price: null, available: false };
   } finally {
     await browser.close();

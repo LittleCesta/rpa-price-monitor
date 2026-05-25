@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import logger from "../utils/logger";
+import LoggerHelper from "../utils/logger";
 import { ENVIRONMENT } from "../environment";
 
 interface AlertPayload {
@@ -18,11 +18,14 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export async function sendPriceAlert(payload: AlertPayload): Promise<void> {
+export async function sendPriceAlert(
+  payload: AlertPayload,
+  logger: LoggerHelper,
+): Promise<void> {
   const { productName, currentPrice, targetPrice, url } = payload;
 
   if (ENVIRONMENT.smtpUser) {
-    logger.warn("ALERT_EMAIL não configurado — alerta não enviado.");
+    logger.log("WARN", "ALERT_EMAIL não configurado — alerta não enviado.");
     return;
   }
 
@@ -44,5 +47,8 @@ export async function sendPriceAlert(payload: AlertPayload): Promise<void> {
     `,
   });
 
-  logger.info(`Alerta enviado para ${ENVIRONMENT.alertEmail} — ${productName}`);
+  logger.log(
+    "INFO",
+    `Alerta enviado para ${ENVIRONMENT.alertEmail} — ${productName}`,
+  );
 }
