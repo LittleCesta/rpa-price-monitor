@@ -1,0 +1,29 @@
+{
+  "name": "rpa-price-monitor",
+  "version": "1.0.0",
+  "description": "RPA para monitoramento de preços de produtos no Mercado Livre",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node --env-file=.env.production ./dist/src/index.js",
+    "dev": "tsx watch --env-file=.env.development ./src/index.ts",
+    "scrape": "ts-node src/jobs/scrapeJob.ts",
+    "lint": "eslint src/**/*.ts"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "mongoose": "^8.4.0",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.13",
+    "playwright": "^1.44.0",
+    "tsx": "^4.22.3",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@types/node-cron": "^3.0.11",
+    "@types/nodemailer": "^6.4.15",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
