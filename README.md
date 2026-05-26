@@ -4,6 +4,22 @@ RPA de monitoramento de preços de produtos no Mercado Livre. O sistema acessa a
 
 ---
 
+## 💼 Contexto profissional
+
+Este projeto foi desenvolvido como extensão natural do meu trabalho diário como
+Software Developer, onde atuo com automação de processos (RPA) usando Playwright,
+Puppeteer e TypeScript em ambiente corporativo.
+
+No trabalho, minhas automações rodam em produção via Docker e Docker Compose,
+têm impacto direto no SLA do setor e passam por revisão de código e validação
+de PRs — a mesma estrutura que adotei aqui.
+
+Como a maior parte dos projetos da empresa são privados, este repositório reflete
+a stack e as boas práticas que aplico no dia a dia: arquitetura em camadas,
+logging estruturado, containerização completa e separação clara de responsabilidades.
+
+---
+
 ## 🧩 Funcionalidades
 
 - Scraping automatizado de páginas de produtos no Mercado Livre com **Playwright**
@@ -32,7 +48,7 @@ src/
 │   └── alertService.ts    # Envio de alertas por e-mail
 ├── utils/
 │   ├── database.ts        # Conexão com MongoDB
-│   └── logger.ts          # Logger com Winston
+│   └── logger.ts          # Logger
 └── environment.ts         # Mapeamento das variáveis de ambiente
 ```
 
@@ -91,7 +107,6 @@ Pronto! O RPA vai rodar uma checagem imediata e depois seguir o agendamento defi
 - **MongoDB + Mongoose** — banco de dados e ODM
 - **node-cron** — agendamento de tarefas
 - **Nodemailer** — envio de e-mails
-- **Winston** — logging estruturado
 - **Docker / Docker Compose** — containerização
 
 ---
