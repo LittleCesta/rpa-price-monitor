@@ -12,6 +12,7 @@ export const ENVIRONMENT = {
     uri: process.env.MONGO_URI,
   },
   threshold: Number(process.env.THRESHOLD),
+  mercadoLivreBaseUrl: "https://www.mercadolivre.com.br/",
 };
 
 export const browserConfig: LaunchOptions = {
