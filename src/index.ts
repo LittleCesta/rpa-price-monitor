@@ -2,20 +2,22 @@ import "dotenv/config";
 import { connectDB } from "./utils/database";
 import { startScrapeJob } from "./jobs/scrapeJob";
 import { addProduct, checkAllProducts } from "./services/priceService";
-import logger from "./utils/logger";
+import Logger from "./utils/logger";
 
 (async function main() {
-  await connectDB();
+  const logger = new Logger("./price-monitor.log", "price-monitor");
+  await connectDB(logger);
 
   await addProduct(
     "Morte Subita - Mascara Capilar",
-    "https://lista.mercadolivre.com.br/morte-subita",
+    "mascara-de-hidrataco-morte-subita-450g-lola-cosmetics/p/MLB19485497?pdp_filters=item_id%3AMLB2752028221",
     30,
-  ).catch(() => {});
+    logger,
+  );
 
-  await checkAllProducts();
+  await checkAllProducts(logger);
 
-  startScrapeJob();
+  startScrapeJob(logger);
 
-  logger.info("RPA Price Monitor rodando. Aguardando próximo ciclo...");
+  logger.log("INFO", "RPA Price Monitor rodando. Aguardando próximo ciclo...");
 })();
