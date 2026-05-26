@@ -67,7 +67,7 @@ async function checkProduct(
 
 export async function addProduct(
   name: string,
-  url: string,
+  urlSufix: string,
   targetPrice: number,
   logger: LoggerHelper,
 ): Promise<IProduct> {
@@ -76,7 +76,11 @@ export async function addProduct(
     logger.log("WARN", `Produto já existe: ${name}`);
     return productExists;
   } else {
-    const product = await Product.create({ name, url, targetPrice });
+    const product = await Product.create({
+      name,
+      url: `${ENVIRONMENT.mercadoLivreBaseUrl}${urlSufix}`,
+      targetPrice,
+    });
     logger.log("INFO", `Produto cadastrado: ${name}`);
     return product;
   }
