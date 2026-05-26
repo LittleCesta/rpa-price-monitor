@@ -22,8 +22,10 @@ export function startScrapeJob(logger: LoggerHelper): void {
     try {
       await checkAllProducts(logger);
       logger.log("INFO", "Job finalizado com sucesso.");
+      return true;
     } catch (err) {
       logger.log("ERROR", "Erro no job de scraping:" + err);
+      return false;
     }
   });
 }
