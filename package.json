@@ -16,8 +16,7 @@
     "node-cron": "^3.0.3",
     "nodemailer": "^6.9.13",
     "playwright": "^1.44.0",
-    "tsx": "^4.22.3",
-    "winston": "^3.13.0"
+    "tsx": "^4.22.3"
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
