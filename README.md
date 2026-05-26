@@ -26,7 +26,7 @@ logging estruturado, containerização completa e separação clara de responsab
 - Armazenamento do histórico de preços no **MongoDB**
 - Alertas por **e-mail** quando o preço cai abaixo do valor alvo
 - Agendamento via **cron** configurável por variável de ambiente
-- Logs estruturados em arquivo e console com **Winston**
+- Logs estruturados em arquivo e console
 - Ambiente 100% containerizado com **Docker** e **Docker Compose**
 
 ---
