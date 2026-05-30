@@ -2,7 +2,6 @@ import { LaunchOptions } from "playwright";
 
 export const ENVIRONMENT = {
   headlessMode: process.env.NODE_ENVIRONMENT != "production" ? false : true,
-  executionSchedule: process.env.CRON_SCHEDULE,
   smtpHost: process.env.SMTP_HOST,
   smtpPort: process.env.SMTP_PORT,
   smtpUser: process.env.SMTP_USER,
