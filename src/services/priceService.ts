@@ -27,10 +27,11 @@ async function checkProduct(
   product: IProduct,
   logger: LoggerHelper,
 ): Promise<void> {
-  const result = await scrapeMercadoLivre(product.url, logger);
+  logger.log("INFO", `Validando scrapping do produto`);
+  const result = await scrapeMercadoLivre(product.url, product.name, logger);
 
   if (!result.price) {
-    logger.log("WARN", `Preço não encontrado para: ${product.name}`);
+    logger.log("WARN", `Produto não retornou preço: ${product.name}`);
     return;
   }
 
