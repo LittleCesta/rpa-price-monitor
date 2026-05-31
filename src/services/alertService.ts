@@ -24,7 +24,7 @@ export async function sendPriceAlert(
 ): Promise<void> {
   const { productName, currentPrice, targetPrice, url } = payload;
 
-  if (ENVIRONMENT.smtpUser) {
+  if (!ENVIRONMENT.smtpUser) {
     logger.log("WARN", "ALERT_EMAIL não configurado — alerta não enviado.");
     return;
   }
