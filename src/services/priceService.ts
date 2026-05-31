@@ -80,7 +80,7 @@ export async function addProduct(
 ): Promise<IProduct> {
   const productExists = await findProduct(name, targetPrice, urlSufix, logger);
   if (productExists) {
-    logger.log("WARN", `Produto já existe: ${name}`);
+    logger.log("WARN", `Produto já existe`);
     return productExists;
   } else {
     const product = await Product.create({
