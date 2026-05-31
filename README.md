@@ -90,7 +90,6 @@ Pronto! O RPA vai rodar uma checagem imediata e depois seguir o agendamento defi
 | ---------------------- | ------------------------------- | ------------------------------------- |
 | `NODE_ENVIRONMENT`     | Ambiente de execução do node    | —                                     |
 | `MONGO_URI`            | URI de conexão com o MongoDB    | `mongodb://mongo:27017/price-monitor` |
-| `CRON_SCHEDULE`        | Agendamento no formato cron     | `0 9 * * *` (todo dia às 9h)          |
 | `PRICE_DROP_THRESHOLD` | % de queda para disparar alerta | `10`                                  |
 | `ALERT_EMAIL`          | E-mail que receberá os alertas  | —                                     |
 | `SMTP_HOST`            | Host do servidor SMTP           | —                                     |
@@ -105,7 +104,7 @@ Pronto! O RPA vai rodar uma checagem imediata e depois seguir o agendamento defi
 - **TypeScript** — tipagem estática
 - **Playwright** — automação de browser
 - **MongoDB + Mongoose** — banco de dados e ODM
-- **node-cron** — agendamento de tarefas
+- **node-schedule** — agendamento de tarefas
 - **Nodemailer** — envio de e-mails
 - **Docker / Docker Compose** — containerização
 
