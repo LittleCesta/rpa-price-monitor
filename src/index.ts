@@ -2,6 +2,7 @@ import "dotenv/config";
 import { startScrapeJob } from "./jobs/scrapeJob";
 import Logger from "./utils/logger";
 import schedule from "node-schedule";
+import { connectDB } from "./utils/database";
 
 (async function main() {
   const logger = new Logger("./price-monitor.log", "price-monitor");
@@ -14,6 +15,8 @@ import schedule from "node-schedule";
       tz: "America/Sao_Paulo",
     },
     async () => {
+      await connectDB(logger);
+
       startScrapeJob(logger);
 
       logger.log(
@@ -32,4 +35,5 @@ import schedule from "node-schedule";
         .nextInvocation()
         .toLocaleString("pt-br", { timeZone: "America/Sao_Paulo" }),
   );
+  job.invoke();
 })();
