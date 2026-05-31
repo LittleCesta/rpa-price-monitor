@@ -1,9 +1,10 @@
 import Product, { IProduct } from "../models/Product";
 import PriceHistory from "../models/PriceHistory";
-import { scrapeMercadoLivre } from "../scrapers/mercadoLivreScraper";
+import { MercadoLivreScraper } from "../scrapers/mercadoLivreScraper";
 import { sendPriceAlert } from "./alertService";
 import LoggerHelper from "../utils/logger";
 import { ENVIRONMENT } from "../environment";
+import { IScraper } from "../types/scraper-types";
 
 export async function checkAllProducts(logger: LoggerHelper): Promise<void> {
   const products = await Product.find();
@@ -27,8 +28,9 @@ async function checkProduct(
   product: IProduct,
   logger: LoggerHelper,
 ): Promise<void> {
+  const scraper = getScraperByUrl(product.url);
   logger.log("INFO", `Validando scrapping do produto`);
-  const result = await scrapeMercadoLivre(product.url, product.name, logger);
+  const result = await scraper.scrape(product.url, product.name, logger);
 
   if (!result.price) {
     logger.log("WARN", `Produto não retornou preço: ${product.name}`);
@@ -40,6 +42,7 @@ async function checkProduct(
     productId: product._id,
     productName: product.name,
     price: result.price,
+    productUrl: product.url,
     available: result.available,
   });
 
@@ -48,12 +51,13 @@ async function checkProduct(
     `[${product.name}] Preço atual: R$ ${result.price.toFixed(2)}`,
   );
 
-  const droppedEnough =
-    result.price <= product.targetPrice ||
-    ((product.targetPrice - result.price) / product.targetPrice) * 100 >=
-      ENVIRONMENT.threshold;
+  const droppedEnough = result.price <= product.targetPrice;
 
   if (droppedEnough && result.available) {
+    logger.log(
+      "INFO",
+      `Preço abaixo do alvo! Enviando alerta do produto ${product.name}`,
+    );
     await sendPriceAlert(
       {
         productName: product.name,
@@ -63,6 +67,8 @@ async function checkProduct(
       },
       logger,
     );
+  } else {
+    logger.log("INFO", `Preço não baixou o suficiente`);
   }
 }
 
@@ -72,7 +78,7 @@ export async function addProduct(
   targetPrice: number,
   logger: LoggerHelper,
 ): Promise<IProduct> {
-  const productExists = await findProduct(name, logger);
+  const productExists = await findProduct(name, targetPrice, urlSufix, logger);
   if (productExists) {
     logger.log("WARN", `Produto já existe: ${name}`);
     return productExists;
@@ -91,13 +97,42 @@ export async function getPriceHistory(productId: string) {
   return PriceHistory.find({ productId }).sort({ scrapedAt: -1 }).limit(30);
 }
 
-export async function findProduct(productName: string, logger: LoggerHelper) {
-  const product = await Product.findOne({ name: productName });
-  if (product) {
-    logger.log("INFO", `Produto encontrado: ${product.name}`);
-    return product;
-  } else {
-    logger.log("WARN", `Produto não encontrado: ${productName}`);
+export async function findProduct(
+  productName: string,
+  targetPrice: number,
+  urlSufix: string,
+  logger: LoggerHelper,
+) {
+  try {
+    const product = await Product.findOne({ name: productName });
+    if (product) {
+      logger.log(
+        "INFO",
+        `Produto encontrado: ${product.name}. Atualizando dados do produto`,
+      );
+      await Product.updateOne(
+        { name: productName },
+        {
+          $set: {
+            url: `${ENVIRONMENT.mercadoLivreBaseUrl}${urlSufix}`,
+            targetPrice: targetPrice,
+          },
+        },
+      );
+      return product;
+    } else {
+      logger.log("WARN", `Produto não encontrado: ${productName}`);
+      return false;
+    }
+  } catch (e) {
+    const err = e as Error;
+    logger.log("ERROR", `Erro ao buscar produto: ${err.message}`);
     return false;
   }
+}
+
+function getScraperByUrl(url: string): IScraper {
+  if (url.includes("mercadolivre")) return new MercadoLivreScraper();
+  // if (url.includes("amazon")) return new AmazonScraper();
+  throw new Error(`Site não suportado: ${url}`);
 }
