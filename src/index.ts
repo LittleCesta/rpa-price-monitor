@@ -35,5 +35,4 @@ import { connectDB } from "./utils/database";
         .nextInvocation()
         .toLocaleString("pt-br", { timeZone: "America/Sao_Paulo" }),
   );
-  job.invoke();
 })();
