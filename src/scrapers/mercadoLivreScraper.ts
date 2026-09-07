@@ -91,8 +91,6 @@ export class MercadoLivreScraper implements IScraper {
         //   `Matches encontrados: ${JSON.stringify(debugMatches.map((m) => m[1]))}`,
         // );
 
-        let price: number | null = null;
-
         if (priceAreaText?.includes("OFF")) {
           // Pega todos os preços no formato R$X.XXX,XX ou R$XXX,XX ou R$XXX
           const allPrices = [
