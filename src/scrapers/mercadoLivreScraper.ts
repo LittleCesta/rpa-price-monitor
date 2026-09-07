@@ -82,21 +82,37 @@ export class MercadoLivreScraper implements IScraper {
         const priceAreaText = await priceArea.textContent();
         logger.log("INFO", `Conteúdo da área de preço: ${priceAreaText}`);
 
-        const [, fullPrice, discountPrice] = priceAreaText
-          ? priceAreaText.split("R$")
-          : ["", "", ""];
+        // const debugMatches = [
+        //   ...(priceAreaText?.matchAll(/R\$(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/g) ??
+        //     []),
+        // ];
+        // logger.log(
+        //   "INFO",
+        //   `Matches encontrados: ${JSON.stringify(debugMatches.map((m) => m[1]))}`,
+        // );
+
+        let price: number | null = null;
 
         if (priceAreaText?.includes("OFF")) {
-          const discount = discountPrice.slice(5, 8);
-          const priceMatch = discountPrice.match(/\d+,\d{2}/);
-          logger.log(
-            "INFO",
-            `Desconto de ${discount} encontrado, pegando preço com desconto.`,
-          );
-          price = parsePrice(priceMatch?.[0] ?? null);
+          // Pega todos os preços no formato R$X.XXX,XX ou R$XXX,XX ou R$XXX
+          const allPrices = [
+            ...(priceAreaText?.matchAll(
+              /R\$(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/g,
+            ) ?? []),
+          ];
+
+          // O preço com desconto é sempre o segundo (o primeiro é o original riscado)
+          if (allPrices.length >= 2) {
+            const discountRaw = allPrices[1][1]; // pega o grupo de captura sem o R$
+            logger.log("INFO", `Preço com desconto encontrado: ${discountRaw}`);
+            price = parsePrice(discountRaw);
+          }
         } else {
-          logger.log("INFO", "Desconto não encontrado, pegando preço normal.");
-          price = parsePrice(fullPrice);
+          // Sem desconto — pega o primeiro preço
+          const match = priceAreaText?.match(
+            /R\$(\d{1,3}(?:\.\d{3})*(?:,\d{2})?)/,
+          );
+          price = parsePrice(match?.[1] ?? null);
         }
 
         logger.log("INFO", `Preço: ${price}`);
