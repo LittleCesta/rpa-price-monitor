@@ -16,10 +16,9 @@ export async function connectDB(logger: LoggerHelper): Promise<void> {
       serverSelectionTimeoutMS: 10000,
     });
     logger.log("INFO", "MongoDB conectado.");
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("Erro completo:", JSON.stringify(err, null, 2));
-    console.error("Mensagem:", err.message);
-    console.error("Causa:", err.cause);
+    console.error("Mensagem:", (err as Error).message);
     process.exit(1);
   }
 }
