@@ -4,7 +4,7 @@
   "description": "RPA para monitoramento de preços de produtos no Mercado Livre",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && xcopy /E /I /Y src\\public dist\\src\\public",
     "start": "npm run build && node --env-file=.env.production ./dist/src/index.js",
     "dev": "tsx watch --env-file=.env.development ./src/index.ts",
     "scrape": "ts-node src/jobs/scrapeJob.ts",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "dotenv": "^16.4.5",
+    "express": "^5.2.1",
     "mongoose": "^8.4.0",
     "node-schedule": "^2.1.1",
     "nodemailer": "^6.9.13",
@@ -19,6 +20,7 @@
     "tsx": "^4.22.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^20.14.2",
     "@types/node-schedule": "^2.1.8",
     "@types/nodemailer": "^6.4.15",
