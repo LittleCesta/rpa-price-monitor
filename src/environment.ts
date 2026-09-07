@@ -12,6 +12,11 @@ export const ENVIRONMENT = {
   },
   threshold: Number(process.env.THRESHOLD),
   mercadoLivreBaseUrl: "https://www.mercadolivre.com.br/",
+  mercadolivre: {
+    appId: process.env.ML_APP_ID,
+    secret: process.env.ML_SECRET,
+    accessToken: process.env.ML_ACCESS_TOKEN,
+  },
 };
 
 export const browserConfig: LaunchOptions = {
