@@ -1,5 +1,7 @@
 # 🤖 RPA Price Monitor
 
+![CI](https://github.com/LittleCesta/rpa-price-monitor/actions/workflows/ci.yml/badge.svg)
+
 RPA de monitoramento de preços de produtos no Mercado Livre. O sistema acessa as páginas dos produtos automaticamente, coleta os preços, salva o histórico no banco de dados e envia alertas por e-mail quando o preço atinge o valor desejado.
 
 ---
