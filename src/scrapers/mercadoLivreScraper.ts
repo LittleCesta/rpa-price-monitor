@@ -3,7 +3,7 @@ import LoggerHelper from "../utils/logger";
 import { browserConfig } from "../environment";
 import { IScraper, ScrapeResult } from "../types/scraper-types";
 
-function parsePrice(text: string | null): number | null {
+export function parsePrice(text: string | null): number | null {
   if (!text) return null;
   const cleaned = text.replace(/\./g, "").replace(",", ".").trim();
   const value = parseFloat(cleaned);
