@@ -3,9 +3,12 @@ import { startScrapeJob } from "./jobs/scrapeJob";
 import Logger from "./utils/logger";
 import schedule from "node-schedule";
 import { connectDB } from "./utils/database";
+import { startServer } from "./server";
 
 (async function main() {
   const logger = new Logger("./price-monitor.log", "price-monitor");
+
+  await startServer();
 
   const job = schedule.scheduleJob(
     {
