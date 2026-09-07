@@ -4,7 +4,7 @@
   "description": "RPA para monitoramento de preços de produtos no Mercado Livre",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && xcopy /E /I /Y src\\public dist\\src\\public",
+    "build": "tsc && node scripts/copy-assets.js",
     "start": "npm run build && node --env-file=.env.production ./dist/src/index.js",
     "dev": "tsx watch --env-file=.env.development ./src/index.ts",
     "scrape": "ts-node src/jobs/scrapeJob.ts",
